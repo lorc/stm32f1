@@ -1,0 +1,68 @@
+# Make sure CMAKE can find our custom toolchain file
+SET(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/arm.cmake")
+
+# Set the compiler executables to gcc-arm-embedded. These need to be on the system path
+SET(CMAKE_C_COMPILER "arm-none-eabi-gcc")
+SET(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
+SET(CMAKE_ASM_COMPILER "arm-none-eabi-as")
+SET(CMAKE_OBJCOPY "arm-none-eabi-objcopy")
+SET(CMAKE_OBJDUMP "arm-none-eabi-objdump")
+
+# Set the common compiler flags
+SET(CMAKE_C_FLAGS "-mthumb -fno-builtin -mcpu=cortex-m3 --specs=nano.specs -Wall -std=c99 -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-unroll-loops -ffast-math -ftree-vectorize")
+SET(CMAKE_CXX_FLAGS "-mthumb -fno-builtin -mcpu=cortex-m3 --specs=nano.specs -Wall -Wno-unused-function -Wno-unused-local-typedefs -std=c++11 -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-unroll-loops -ffast-math -ftree-vectorize")
+
+# Set the custom compiler flags for Debug and Release builds
+SET(CMAKE_C_FLAGS_DEBUG "-O0 -g3 ${BUILD_DEFINITIONS_DEBUG} ${BUILD_DEFINITIONS_TARGET} ${BUILD_DEFINITIONS}")
+SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
+SET(CMAKE_ASM_FLAGS_DEBUG "-g")
+
+SET(CMAKE_C_FLAGS_RELEASE "-O0 ${BUILD_DEFINITIONS_RELEASE} ${BUILD_DEFINITIONS_TARGET} ${BUILD_DEFINITIONS}")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O0")
+SET(CMAKE_ASM_FLAGS_RELEASE "")
+
+# Set the linker flags
+SET(CMAKE_EXE_LINKER_FLAGS "-T${CMAKE_CURRENT_BINARY_DIR}/stm32_flash.ld -nostartfiles -mthumb -static -mcpu=cortex-m3 -Wl,--gc-sections -Wl,-Map,${CMAKE_PROJECT_NAME}.map")
+
+# Make sure CMAKE doesn't try to create shared libraries. Otherwise our linker gets a -rdynamic flag
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "") 
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") 
+SET(CMAKE_SHARED_LIBRARY_LINK_ASM_FLAGS "") 
+SET(SHARED_LIBS OFF)
+SET(STATIC_LIBS ON)
+
+
+# Add a custom target to generate the .hex and .bin files using objcopy, and output them to the Output directory
+ADD_CUSTOM_TARGET(${CMAKE_PROJECT_NAME}.hex DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND ${CMAKE_OBJCOPY} -Oihex ${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex)
+ADD_CUSTOM_TARGET(${CMAKE_PROJECT_NAME}.bin DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND ${CMAKE_OBJCOPY} -Obinary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin)
+
+# Add custom targets to help with starting the JLinkGDBServer and gdb
+ADD_CUSTOM_TARGET(gdb DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --tui --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/gdbcommands.txt)
+ADD_CUSTOM_TARGET(jlink COMMAND JLinkGDBServer -if SWD -device STM32F100VC)
+
+CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/flashcommands.txt ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt)
+ADD_CUSTOM_TARGET(flash DEPENDS ${CMAKE_PROJECT_NAME}.bin COMMAND stdbuf -oL JLinkExe -CommanderScript ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt | tee /dev/tty | grep --quiet "Verify successful")
+
+ADD_CUSTOM_TARGET(reset DEPENDS COMMAND JLinkExe -CommanderScript ${CMAKE_CURRENT_LIST_DIR}/resetcommands.txt)
+
+ADD_CUSTOM_TARGET(screen.bin DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/screencommands.txt)
+ADD_CUSTOM_TARGET(screen.png DEPENDS screen.bin COMMAND python ${CMAKE_CURRENT_LIST_DIR}/bin_to_png.py screen.bin screen.png)
+
+ADD_CUSTOM_TARGET(eventdebug DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/eventsniffer.txt)
+
+# Save the current directory so we can use it in the function later on
+SET(TOOLCHAIN_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+# Custom function to generate the linker file based on configured parameters.
+FUNCTION(STM32_SET_PARAMS FLASH_SIZE RAM_SIZE STACK_ADDRESS STACK_SIZE)
+    SET(STACK_ADDRESS ${STACK_ADDRESS})
+    SET(FLASH_SIZE ${FLASH_SIZE})
+    SET(RAM_SIZE ${RAM_SIZE})
+    SET(EXT_RAM_SIZE "0K")
+    SET(MIN_STACK_SIZE ${STACK_SIZE})
+    SET(MIN_HEAP_SIZE "0")
+    SET(FLASH_ORIGIN "0x08000000")
+    SET(RAM_ORIGIN "0x20000000")
+    SET(EXT_RAM_ORIGIN "0x60000000")
+    CONFIGURE_FILE(${TOOLCHAIN_DIR}/stm32_flash.ld.in ${CMAKE_CURRENT_BINARY_DIR}/stm32_flash.ld)
+ENDFUNCTION(STM32_SET_PARAMS)
