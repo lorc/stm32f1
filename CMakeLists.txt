@@ -21,6 +21,8 @@ include(${LIBRARIES_DIR}/stm32f10x/stm32f10x.cmake)
 # Modules cmake includes
 #include(${MODULES_DIR}/event/event.cmake)
 
+# Programmer
+include(${TOOLCHAIN_DIR}/stlink.cmake)
 
 
 

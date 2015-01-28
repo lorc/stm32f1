@@ -37,11 +37,11 @@ ADD_CUSTOM_TARGET(${CMAKE_PROJECT_NAME}.hex DEPENDS ${CMAKE_PROJECT_NAME}.elf CO
 ADD_CUSTOM_TARGET(${CMAKE_PROJECT_NAME}.bin DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND ${CMAKE_OBJCOPY} -Obinary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin)
 
 # Add custom targets to help with starting the JLinkGDBServer and gdb
-ADD_CUSTOM_TARGET(gdb DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --tui --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/gdbcommands.txt)
-ADD_CUSTOM_TARGET(jlink COMMAND JLinkGDBServer -if SWD -device STM32F100VC)
+#ADD_CUSTOM_TARGET(gdb DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --tui --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/gdbcommands.txt)
+#ADD_CUSTOM_TARGET(jlink COMMAND JLinkGDBServer -if SWD -device STM32F100VC)
 
-CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/flashcommands.txt ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt)
-ADD_CUSTOM_TARGET(flash DEPENDS ${CMAKE_PROJECT_NAME}.bin COMMAND stdbuf -oL JLinkExe -CommanderScript ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt | tee /dev/tty | grep --quiet "Verify successful")
+#CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/flashcommands.txt ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt)
+#ADD_CUSTOM_TARGET(flash DEPENDS ${CMAKE_PROJECT_NAME}.bin COMMAND stdbuf -oL JLinkExe -CommanderScript ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt | tee /dev/tty | grep --quiet "Verify successful")
 
 ADD_CUSTOM_TARGET(reset DEPENDS COMMAND JLinkExe -CommanderScript ${CMAKE_CURRENT_LIST_DIR}/resetcommands.txt)
 
