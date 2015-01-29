@@ -9,7 +9,7 @@ SET(CMAKE_OBJCOPY "arm-none-eabi-objcopy")
 SET(CMAKE_OBJDUMP "arm-none-eabi-objdump")
 
 # Set the common compiler flags
-SET(CMAKE_C_FLAGS "-mthumb -fno-builtin -mcpu=cortex-m3 --specs=nano.specs -Wall -std=c99 -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-unroll-loops -ffast-math -ftree-vectorize")
+SET(CMAKE_C_FLAGS "-mthumb -fno-builtin -mcpu=cortex-m3 --specs=nano.specs -Wall -std=c99 -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-unroll-loops -ffast-math -ftree-vectorize -g")
 SET(CMAKE_CXX_FLAGS "-mthumb -fno-builtin -mcpu=cortex-m3 --specs=nano.specs -Wall -Wno-unused-function -Wno-unused-local-typedefs -std=c++11 -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-unroll-loops -ffast-math -ftree-vectorize")
 
 # Set the custom compiler flags for Debug and Release builds
