@@ -11,6 +11,7 @@ SET(MODULES_DIR ${CMAKE_CURRENT_LIST_DIR}/modules)
 SET(DRIVERS_DIR ${CMAKE_CURRENT_LIST_DIR}/drivers)
 SET(LIBRARIES_DIR ${CMAKE_CURRENT_LIST_DIR}/libs)
 
+enable_language(ASM)
 
 # Toolchain cmake includes
 include(${TOOLCHAIN_DIR}/toolchain.cmake)
@@ -25,20 +26,19 @@ include(${TOOLCHAIN_DIR}/stlink.cmake)
 # Current directory includes
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-link_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# Add executable
 add_executable (
     ${CMAKE_PROJECT_NAME}.elf
     ${LIBRARIES_DIR}/stm32f10x/system_stm32f10x.c
+    ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_gpio.c
+    ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_rcc.c
     main.c
     startup_stm32f10x.c
 )
 
 target_link_libraries (
     ${CMAKE_PROJECT_NAME}.elf
-    # Add libraries used in the project here
-
     stm32f10x
-
 )
+
+add_dependencies(${CMAKE_PROJECT_NAME}.elf stm32f10x)

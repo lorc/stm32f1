@@ -22,6 +22,7 @@ SET(CMAKE_CXX_FLAGS_RELEASE "-O0")
 SET(CMAKE_ASM_FLAGS_RELEASE "")
 
 # Set the linker flags
+SET(CMAKE_C_LINK_FLAGS "") #For OSX, not empty by default
 SET(CMAKE_EXE_LINKER_FLAGS "-T${CMAKE_CURRENT_BINARY_DIR}/stm32_flash.ld -nostartfiles -mthumb -static -mcpu=cortex-m3 -Wl,--gc-sections -Wl,-Map,${CMAKE_PROJECT_NAME}.map")
 
 # Make sure CMAKE doesn't try to create shared libraries. Otherwise our linker gets a -rdynamic flag
@@ -36,19 +37,9 @@ SET(STATIC_LIBS ON)
 ADD_CUSTOM_TARGET(${CMAKE_PROJECT_NAME}.hex DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND ${CMAKE_OBJCOPY} -Oihex ${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex)
 ADD_CUSTOM_TARGET(${CMAKE_PROJECT_NAME}.bin DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND ${CMAKE_OBJCOPY} -Obinary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin)
 
-# Add custom targets to help with starting the JLinkGDBServer and gdb
-#ADD_CUSTOM_TARGET(gdb DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --tui --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/gdbcommands.txt)
-#ADD_CUSTOM_TARGET(jlink COMMAND JLinkGDBServer -if SWD -device STM32F100VC)
-
-#CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/flashcommands.txt ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt)
-#ADD_CUSTOM_TARGET(flash DEPENDS ${CMAKE_PROJECT_NAME}.bin COMMAND stdbuf -oL JLinkExe -CommanderScript ${CMAKE_CURRENT_BINARY_DIR}/flashcommands.txt | tee /dev/tty | grep --quiet "Verify successful")
 
 ADD_CUSTOM_TARGET(reset DEPENDS COMMAND JLinkExe -CommanderScript ${CMAKE_CURRENT_LIST_DIR}/resetcommands.txt)
 
-ADD_CUSTOM_TARGET(screen.bin DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/screencommands.txt)
-ADD_CUSTOM_TARGET(screen.png DEPENDS screen.bin COMMAND python ${CMAKE_CURRENT_LIST_DIR}/bin_to_png.py screen.bin screen.png)
-
-ADD_CUSTOM_TARGET(eventdebug DEPENDS ${CMAKE_PROJECT_NAME}.elf COMMAND arm-none-eabi-gdb --se=${CMAKE_PROJECT_NAME}.elf --command=${CMAKE_CURRENT_LIST_DIR}/eventsniffer.txt)
 
 # Save the current directory so we can use it in the function later on
 SET(TOOLCHAIN_DIR ${CMAKE_CURRENT_LIST_DIR})

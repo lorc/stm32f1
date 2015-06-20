@@ -1,6 +1,5 @@
 add_library(
     stm32f10x
-    STATIC
 
     ${CMAKE_CURRENT_LIST_DIR}/core_cm3.c
     ${CMAKE_CURRENT_LIST_DIR}/system_stm32f10x.c
