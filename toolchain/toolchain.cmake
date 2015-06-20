@@ -7,6 +7,8 @@ SET(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
 SET(CMAKE_ASM_COMPILER "arm-none-eabi-as")
 SET(CMAKE_OBJCOPY "arm-none-eabi-objcopy")
 SET(CMAKE_OBJDUMP "arm-none-eabi-objdump")
+SET(CMAKE_RANLIB "arm-none-eabi-ranlib")
+SET(CMAKE_AR "arm-none-eabi-ar")
 
 # Set the common compiler flags
 SET(CMAKE_C_FLAGS "-mthumb -fno-builtin -mcpu=cortex-m3 --specs=nano.specs -Wall -std=c99 -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-unroll-loops -ffast-math -ftree-vectorize -g")

@@ -29,9 +29,9 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 add_executable (
     ${CMAKE_PROJECT_NAME}.elf
-    ${LIBRARIES_DIR}/stm32f10x/system_stm32f10x.c
-    ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_gpio.c
-    ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_rcc.c
+    # ${LIBRARIES_DIR}/stm32f10x/system_stm32f10x.c
+    # ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_gpio.c
+    # ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_rcc.c
     main.c
     startup_stm32f10x.c
 )
