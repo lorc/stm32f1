@@ -18,16 +18,8 @@ include(${TOOLCHAIN_DIR}/toolchain.cmake)
 # Library cmake includes
 include(${LIBRARIES_DIR}/stm32f10x/stm32f10x.cmake)
 
-# Modules cmake includes
-#include(${MODULES_DIR}/event/event.cmake)
-
 # Programmer
 include(${TOOLCHAIN_DIR}/stlink.cmake)
-
-
-
-# Drivers cmake includes
-#include(${DRIVERS_DIR}/captouch/captouch.cmake)
 
 
 # Current directory includes
@@ -35,12 +27,10 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 link_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# Set the parameters of the STM32F100VC
-STM32_SET_PARAMS("256K" "24K" "0x20005f00" "0x1A00")
-
 # Add executable
 add_executable (
     ${CMAKE_PROJECT_NAME}.elf
+    ${LIBRARIES_DIR}/stm32f10x/system_stm32f10x.c
     main.c
     startup_stm32f10x.c
 )
