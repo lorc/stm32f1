@@ -38,6 +38,5 @@ add_executable (
 target_link_libraries (
     ${CMAKE_PROJECT_NAME}.elf
     stm32f10x
-    ${mbed}
 )
 
