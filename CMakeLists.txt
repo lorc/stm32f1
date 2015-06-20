@@ -26,12 +26,11 @@ include(${TOOLCHAIN_DIR}/stlink.cmake)
 # Current directory includes
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
+# Set the parameters of the STM32F100VC
+STM32_SET_PARAMS("256K" "24K" "0x20005f00" "0x1A00")
 
 add_executable (
     ${CMAKE_PROJECT_NAME}.elf
-    # ${LIBRARIES_DIR}/stm32f10x/system_stm32f10x.c
-    # ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_gpio.c
-    # ${LIBRARIES_DIR}/stm32f10x/src/stm32f10x_rcc.c
     main.c
     startup_stm32f10x.c
 )
@@ -39,6 +38,6 @@ add_executable (
 target_link_libraries (
     ${CMAKE_PROJECT_NAME}.elf
     stm32f10x
+    ${mbed}
 )
 
-add_dependencies(${CMAKE_PROJECT_NAME}.elf stm32f10x)
