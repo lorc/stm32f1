@@ -3,8 +3,9 @@ SET(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/arm.cmake")
 
 # Set the compiler executables to gcc-arm-embedded. These need to be on the system path
 SET(CMAKE_C_COMPILER "arm-none-eabi-gcc")
-SET(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
-SET(CMAKE_ASM_COMPILER "arm-none-eabi-as")
+SET(CMAKE_CXX_COMPILER
+"arm-none-eabi-g++")
+SET(CMAKE_ASM_COMPILER "arm-none-eabi-gcc")
 SET(CMAKE_OBJCOPY "arm-none-eabi-objcopy")
 SET(CMAKE_OBJDUMP "arm-none-eabi-objdump")
 SET(CMAKE_RANLIB "arm-none-eabi-ranlib")
@@ -25,12 +26,13 @@ SET(CMAKE_ASM_FLAGS_RELEASE "")
 
 # Set the linker flags
 SET(CMAKE_C_LINK_FLAGS "") #For OSX, not empty by default
-SET(CMAKE_EXE_LINKER_FLAGS "-T${CMAKE_CURRENT_BINARY_DIR}/stm32_flash.ld -nostartfiles -mthumb -static -mcpu=cortex-m3 -Wl,--gc-sections -Wl,-Map,${CMAKE_PROJECT_NAME}.map")
+#SET(CMAKE_EXE_LINKER_FLAGS "-T${TOOLCHAIN_DIR}/STM32F103X8_FLASH.ld -nostartfiles -mthumb -static -mcpu=cortex-m3 -Wl,--gc-sections -Wl,-Map,${CMAKE_PROJECT_NAME}.map")
+SET(CMAKE_EXE_LINKER_FLAGS "-T${TOOLCHAIN_DIR}/STM32F103X8_FLASH.ld  -mthumb -static -mcpu=cortex-m3 -Wl,--gc-sections -Wl,-Map,${CMAKE_PROJECT_NAME}.map")
 
 # Make sure CMAKE doesn't try to create shared libraries. Otherwise our linker gets a -rdynamic flag
-SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "") 
-SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") 
-SET(CMAKE_SHARED_LIBRARY_LINK_ASM_FLAGS "") 
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+SET(CMAKE_SHARED_LIBRARY_LINK_ASM_FLAGS "")
 SET(SHARED_LIBS OFF)
 SET(STATIC_LIBS ON)
 
@@ -45,17 +47,3 @@ ADD_CUSTOM_TARGET(reset DEPENDS COMMAND JLinkExe -CommanderScript ${CMAKE_CURREN
 
 # Save the current directory so we can use it in the function later on
 SET(TOOLCHAIN_DIR ${CMAKE_CURRENT_LIST_DIR})
-
-# Custom function to generate the linker file based on configured parameters.
-FUNCTION(STM32_SET_PARAMS FLASH_SIZE RAM_SIZE STACK_ADDRESS STACK_SIZE)
-    SET(STACK_ADDRESS ${STACK_ADDRESS})
-    SET(FLASH_SIZE ${FLASH_SIZE})
-    SET(RAM_SIZE ${RAM_SIZE})
-    SET(EXT_RAM_SIZE "0K")
-    SET(MIN_STACK_SIZE ${STACK_SIZE})
-    SET(MIN_HEAP_SIZE "0")
-    SET(FLASH_ORIGIN "0x08000000")
-    SET(RAM_ORIGIN "0x20000000")
-    SET(EXT_RAM_ORIGIN "0x60000000")
-    CONFIGURE_FILE(${TOOLCHAIN_DIR}/stm32f100.ld.in ${CMAKE_CURRENT_BINARY_DIR}/stm32_flash.ld)
-ENDFUNCTION(STM32_SET_PARAMS)

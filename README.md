@@ -1,20 +1,25 @@
 STM32-Template
 ==============
 
-A Build template for projects using the stm32vl discovery board, 
-CodeSourcery gnu toolchain, and the STM32F10x Standard Peripheral Library.
+A Build template for projects using the stm32f103c8 IC,
+GNU toolchain, and the STM32Cube HAL drivers.
+
+Project uses newest HAL drivers instead of old Peripheral Drivers Library.
+CMAKE used as build system. It simplifies adding new files and also
+make project more modular. Just checkout Libs/ folder!
+
+Template can be easily adapted to other STM32F10x series chips. You will need
+only linker script for your chip. This script can be taken from STM32Cube
+package.
+
+By default, it compiles simple Blinky projects that blinks LED connected to
+PC13 pin.
 
 To test:
 
-   (1) install the toolchain and libarary.
-   (2) change the TOOLROOT and LIBROOT paths in Makefile.common
-   (3) cd to Demo
-   (4) type make
+   (1) install the toolchain
+   (2) execute ./configure script. It will create directory 'build'
+   (3) type 'make Demo.bin' to get .bin file ready to flashing
 
-To create new projects
 
-   (1) clone the Demo directory (name the directory appropriately)
-   (2) change TEMPLATEROOT in the cloned makefile to point to the 
-       template directory
-   (3) modify as needed, adding any needed library objects to the OBJ 
-       list in the Makefile
+Feel free to adapt it to your projects!
